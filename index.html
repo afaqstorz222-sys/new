@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة إدارة الإيفنت - AFAQ Stores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- إضافة مكتبة SheetJS لتصدير Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- إضافة Firebase SDK الجديد -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDerI2KfEJxkN6BB7vbbfKIp5zoVwnp4AM",
+            authDomain: "news-f35d6.firebaseapp.com",
+            databaseURL: "https://news-f35d6-default-rtdb.firebaseio.com",
+            projectId: "news-f35d6",
+            storageBucket: "news-f35d6.firebasestorage.app",
+            messagingSenderId: "732894263757",
+            appId: "1:732894263757:web:53f28b8c7e68a0f0206c84"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // جعل المتغيرات متاحة عالمياً
+        window.firebaseDatabase = database;
+        window.firebaseRef = ref;
+        window.firebaseOnValue = onValue;
+        window.firebaseSet = set;
+        window.firebaseRemove = remove;
+    </script>
+    <style>
+        /* نفس الأنماط السابقة */
+        body {
+            box-sizing: border-box;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .orange-gradient {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        }
+        .orange-gradient-light {
+            background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
+        }
+        .orange-gradient-dark {
+            background: linear-gradient(135deg, #c2410c 0%, #9a3412 100%);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .input-field {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+        .table-row-hover:hover {
+            background-color: #fff7ed;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .action-btn {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            .action-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen font-sans">
+    <div class="min-h-screen p-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl card-shadow p-6 mb-6 fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                                AFAQ
+                            </div>
+                            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mr-3">AFAQ Stores</h1>
+                        </div>
+                        <div>
+                            <p class="text-gray-600 text-sm md:text-base">🎯 لوحة إدارة الإيفنت - إدارة ومتابعة المسجلين في الإيفنت بشكل مباشر</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                        <!-- زر العودة إلى صفحة التسجيل -->
+                        <button onclick="goToRegistration()" 
+                                class="btn-primary flex items-center gap-2 w-full md:w-auto justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            صفحة التسجيل
+                        </button>
+                        
+                        <button onclick="refreshData()" 
+                                class="btn-secondary flex items-center gap-2 w-full md:w-auto justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            تحديث
+                        </button>
+                        <div id="autoRefreshIndicator" class="bg-orange-500 text-white py-2 px-4 rounded-lg text-sm flex items-center gap-2 w-full md:w-auto justify-center">
+                            <div class="w-2 h-2 bg-white rounded-full pulse-animation"></div>
+                            تحديث تلقائي
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="orange-gradient text-white p-5 rounded-xl stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm">إجمالي المسجلين</p>
+                                <p id="totalRegistrations" class="text-2xl md:text-3xl font-bold">0</p>
+                            </div>
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="orange-gradient-light text-white p-5 rounded-xl stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm">آخر تسجيل</p>
+                                <p id="lastRegistration" class="text-base md:text-lg font-semibold truncate max-w-[120px]">لا يوجد</p>
+                            </div>
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="orange-gradient-dark text-white p-5 rounded-xl stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm">تسجيلات اليوم</p>
+                                <p id="todayRegistrations" class="text-2xl md:text-3xl font-bold">0</p>
+                            </div>
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-5 rounded-xl stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100 text-sm">إجراءات التصدير</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button onclick="exportData()" class="text-xs md:text-sm font-semibold bg-white bg-opacity-20 px-2 py-1 rounded hover:bg-opacity-30 transition">📊 Excel</button>
+                                    <button onclick="exportData('csv')" class="text-xs md:text-sm font-semibold bg-white bg-opacity-20 px-2 py-1 rounded hover:bg-opacity-30 transition">CSV</button>
+                                </div>
+                            </div>
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إضافة تسجيل جديد -->
+            <div class="bg-white rounded-2xl card-shadow p-6 mb-6 fade-in">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="bg-orange-100 text-orange-600 p-2 rounded-lg">➕</span>
+                    إضافة تسجيل جديد
+                </h2>
+                <form id="addRegistrationForm" class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <input type="text" id="newName" placeholder="الاسم الكامل" required
+                               class="input-field">
+                    </div>
+                    <div class="flex-1">
+                        <input type="tel" id="newPhone" placeholder="رقم الموبايل" required
+                               class="input-field">
+                    </div>
+                    <button type="submit"
+                            class="btn-success flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        إضافة
+                    </button>
+                </form>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="bg-white rounded-2xl card-shadow p-6 mb-6 fade-in">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="flex-1 w-full">
+                        <div class="relative">
+                            <svg class="absolute right-3 top-3 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" id="searchInput" placeholder="🔍 البحث بالاسم أو رقم الموبايل..."
+                                    class="input-field pr-10">
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button onclick="clearSearch()" 
+                                class="btn-secondary w-1/2 md:w-auto">
+                            مسح البحث
+                        </button>
+                        <button onclick="clearAllData()" 
+                                class="btn-danger w-1/2 md:w-auto flex items-center justify-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            مسح الكل
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registrations Table -->
+            <div class="bg-white rounded-2xl card-shadow overflow-hidden fade-in">
+                <div class="p-4 md:p-6 border-b border-gray-200">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <span class="bg-orange-100 text-orange-600 p-2 rounded-lg">📋</span>
+                            قائمة المسجلين
+                        </h2>
+                        <span id="filteredCount" class="text-gray-600 text-sm bg-gray-100 px-3 py-1 rounded-full"></span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gradient-to-r from-orange-50 to-orange-100">
+                            <tr>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الموبايل</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">وقت التسجيل</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registrationsTable" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let registrations = [];
+        let filteredRegistrations = [];
+
+        // الانتقال إلى صفحة التسجيل
+        function goToRegistration() {
+            window.location.href = 'register.html';
+        }
+
+        // تحميل البيانات من Firebase
+        function loadData() {
+            const registrationsRef = window.firebaseRef(window.firebaseDatabase, 'registrations');
+            
+            window.firebaseOnValue(registrationsRef, (snapshot) => {
+                const data = snapshot.val() || {};
+                registrations = Object.values(data);
+                filteredRegistrations = [...registrations];
+                updateDisplay();
+            });
+        }
+
+        // تحديث العرض
+        function updateDisplay() {
+            updateStatistics();
+            updateTable();
+        }
+
+        // تحديث الإحصائيات
+        function updateStatistics() {
+            document.getElementById('totalRegistrations').textContent = registrations.length;
+
+            if (registrations.length > 0) {
+                const lastReg = registrations[registrations.length - 1];
+                document.getElementById('lastRegistration').textContent = lastReg.name;
+            } else {
+                document.getElementById('lastRegistration').textContent = 'لا يوجد';
+            }
+
+            // حساب تسجيلات اليوم
+            const today = new Date().toDateString();
+            const todayCount = registrations.filter(reg => {
+                const regDate = new Date(reg.timestamp).toDateString();
+                return regDate === today;
+            }).length;
+            document.getElementById('todayRegistrations').textContent = todayCount;
+        }
+
+        // تحديث الجدول
+        function updateTable() {
+            const tableBody = document.getElementById('registrationsTable');
+            const filteredCount = document.getElementById('filteredCount');
+
+            filteredCount.textContent = `عرض ${filteredRegistrations.length} من ${registrations.length}`;
+
+            if (filteredRegistrations.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <div class="text-6xl mb-4">📝</div>
+                                <p class="text-lg font-medium">لا يوجد مسجلين</p>
+                                <p class="text-sm">${registrations.length === 0 ? 'لم يتم تسجيل أي شخص حتى الآن' : 'لا توجد نتائج للبحث الحالي'}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tableBody.innerHTML = filteredRegistrations.map((reg, index) => `
+                    <tr class="table-row-hover transition duration-200">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 md:w-10 md:h-10 orange-gradient rounded-full flex items-center justify-center text-white text-sm font-bold ml-3">
+                                    ${reg.name.charAt(0)}
+                                </div>
+                                <div class="text-sm font-medium text-gray-900">${reg.name}</div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-mono bg-orange-50 rounded">${reg.phone}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${reg.timestamp}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                            <div class="action-buttons">
+                                <button onclick="editRegistration(${reg.id})"
+                                        class="action-btn text-orange-600 bg-orange-50 hover:bg-orange-100">
+                                    <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    تعديل
+                                </button>
+                                <button onclick="deleteRegistration(${reg.id})"
+                                        class="action-btn text-red-600 bg-red-50 hover:bg-red-100">
+                                    <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    حذف
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // إضافة تسجيل جديد
+        document.getElementById('addRegistrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('newName').value.trim();
+            const phone = document.getElementById('newPhone').value.trim();
+
+            if (name && phone) {
+                const registration = {
+                    id: Date.now(),
+                    name: name,
+                    phone: phone,
+                    timestamp: new Date().toLocaleString('ar-EG')
+                };
+
+                // حفظ البيانات في Firebase
+                const registrationRef = window.firebaseRef(window.firebaseDatabase, 'registrations/' + registration.id);
+                
+                window.firebaseSet(registrationRef, registration)
+                    .then(() => {
+                        // إعادة تعيين النموذج
+                        document.getElementById('addRegistrationForm').reset();
+                        showNotification('✅ تم إضافة التسجيل بنجاح!', 'success');
+                    })
+                    .catch((error) => {
+                        console.error('Error saving data:', error);
+                        showNotification('❌ حدث خطأ أثناء إضافة التسجيل', 'error');
+                    });
+            }
+        });
+
+        // البحث
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+
+            if (searchTerm === '') {
+                filteredRegistrations = [...registrations];
+            } else {
+                filteredRegistrations = registrations.filter(reg => 
+                    reg.name.toLowerCase().includes(searchTerm) || 
+                    reg.phone.includes(searchTerm)
+                );
+            }
+
+            updateTable();
+        });
+
+        // مسح البحث
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filteredRegistrations = [...registrations];
+            updateTable();
+        }
+
+        // تعديل تسجيل
+        function editRegistration(id) {
+            const registration = registrations.find(reg => reg.id === id);
+            if (registration) {
+                const newName = prompt('تعديل الاسم:', registration.name);
+                const newPhone = prompt('تعديل رقم الموبايل:', registration.phone);
+
+                if (newName && newPhone) {
+                    const updatedRegistration = {
+                        ...registration,
+                        name: newName.trim(),
+                        phone: newPhone.trim(),
+                        timestamp: new Date().toLocaleString('ar-EG') + ' (محدث)'
+                    };
+
+                    // تحديث البيانات في Firebase
+                    const registrationRef = window.firebaseRef(window.firebaseDatabase, 'registrations/' + id);
+                    
+                    window.firebaseSet(registrationRef, updatedRegistration)
+                        .then(() => {
+                            showNotification('✅ تم تحديث البيانات بنجاح!', 'success');
+                        })
+                        .catch((error) => {
+                            console.error('Error updating data:', error);
+                            showNotification('❌ حدث خطأ أثناء تحديث البيانات', 'error');
+                        });
+                }
+            }
+        }
+
+        // حذف تسجيل
+        function deleteRegistration(id) {
+            if (confirm('🗑 هل أنت متأكد من حذف هذا التسجيل؟')) {
+                // حذف البيانات من Firebase
+                const registrationRef = window.firebaseRef(window.firebaseDatabase, 'registrations/' + id);
+                
+                window.firebaseRemove(registrationRef)
+                    .then(() => {
+                        showNotification('✅ تم حذف التسجيل بنجاح!', 'success');
+                    })
+                    .catch((error) => {
+                        console.error('Error deleting data:', error);
+                        showNotification('❌ حدث خطأ أثناء حذف التسجيل', 'error');
+                    });
+            }
+        }
+
+        // مسح جميع البيانات
+        function clearAllData() {
+            if (confirm('🗑 هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                // حذف جميع البيانات من Firebase
+                const registrationsRef = window.firebaseRef(window.firebaseDatabase, 'registrations');
+                
+                window.firebaseRemove(registrationsRef)
+                    .then(() => {
+                        showNotification('✅ تم حذف جميع البيانات!', 'success');
+                    })
+                    .catch((error) => {
+                        console.error('Error clearing data:', error);
+                        showNotification('❌ حدث خطأ أثناء حذف البيانات', 'error');
+                    });
+            }
+        }
+
+        // تصدير البيانات
+        function exportData(format = 'excel') {
+            if (registrations.length === 0) {
+                showNotification('⚠ لا يوجد بيانات للتصدير', 'warning');
+                return;
+            }
+
+            if (format === 'csv') {
+                // تصدير كملف CSV
+                const csvContent = "data:text/csv;charset=utf-8," 
+                    + "الاسم,رقم الموبايل,وقت التسجيل\n"
+                    + registrations.map(reg => `"${reg.name}","${reg.phone}","${reg.timestamp}"`).join('\n');
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', `AFAQ_Stores_registrations_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('📊 تم تصدير البيانات كملف CSV بنجاح!', 'success');
+            } else {
+                // تصدير كملف Excel
+                try {
+                    // تحضير البيانات لملف Excel
+                    const worksheetData = [
+                        ['الاسم', 'رقم الموبايل', 'وقت التسجيل'], // رؤوس الأعمدة
+                        ...registrations.map(reg => [reg.name, reg.phone, reg.timestamp]) // البيانات
+                    ];
+                    
+                    // إنشاء ورقة عمل
+                    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+                    
+                    // إنشاء مصنف وإضافة الورقة
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'المسجلين');
+                    
+                    // تصدير الملف
+                    const fileName = `AFAQ_Stores_registrations_${new Date().toISOString().split('T')[0]}.xlsx`;
+                    XLSX.writeFile(workbook, fileName);
+                    
+                    showNotification('📊 تم تصدير البيانات كملف Excel بنجاح!', 'success');
+                } catch (error) {
+                    console.error('خطأ في تصدير ملف Excel:', error);
+                    showNotification('❌ حدث خطأ أثناء تصدير ملف Excel. حاول مرة أخرى.', 'error');
+                }
+            }
+        }
+
+        // تحديث البيانات يدوياً
+        function refreshData() {
+            loadData();
+            showNotification('🔄 تم تحديث البيانات!', 'info');
+        }
+
+        // إظهار الإشعارات
+        function showNotification(message, type = 'info') {
+            // إنصراف عناصر الإشعار إذا كانت موجودة
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            // تحديد لون الإشعار حسب النوع
+            let bgColor = 'bg-orange-500';
+            if (type === 'success') bgColor = 'bg-green-500';
+            if (type === 'error') bgColor = 'bg-red-500';
+            if (type === 'warning') bgColor = 'bg-yellow-500';
+
+            // إنشاء عنصر الإشعار
+            const notification = document.createElement('div');
+            notification.className = `notification fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-80 ${bgColor} text-white p-4 rounded-lg shadow-lg z-50 fade-in`;
+            notification.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <span class="ml-2">${message}</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+            // إضافة الإشعار إلى الصفحة
+            document.body.appendChild(notification);
+
+            // إزالة الإشعار تلقائياً بعد 3 ثواني
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        // تحميل البيانات عند فتح الصفحة
+        // ننتظر قليلاً لضمان تحميل Firebase SDK أولاً
+        setTimeout(() => {
+            loadData();
+        }, 1000);
+    </script>
+</body>
+</html>
